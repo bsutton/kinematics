@@ -1,7 +1,14 @@
 package robotics.meArm;
 
-import robotics.helpers.ServoAngleToPwmCalculator;
+import robotics.servos.ServoAngleToPwmCalculator;
 
+/**
+ * extends the MeArmKinematics, adding pwm calculations on top of the joint
+ * angle calculations
+ * 
+ * @author rsutton
+ *
+ */
 public class MeArmServoCalculator extends MeArmKinematics
 {
 
@@ -20,12 +27,12 @@ public class MeArmServoCalculator extends MeArmKinematics
 
 	public double getTurretPwm()
 	{
-		return turret.getPwmValue(TURRET_JOINT_DEF.getJoint().getAngle());
+		return turret.getPwmValue(getComputedJointAngle(TURRET_JOINT));
 	}
 
 	public double getArmBasePwm()
 	{
-		Double jointAngle = -1.0 * MeArmKinematics.BASE_JOINT_DEF.getJoint().getAngle();
+		Double jointAngle = -1.0 * getComputedJointAngle(BASE_JOINT);
 		double pwmValue = armBase.getPwmValue(jointAngle);
 		System.out.println("Base angle: " + Math.toDegrees(jointAngle)
 				+ " pwm: " + pwmValue);
@@ -37,10 +44,11 @@ public class MeArmServoCalculator extends MeArmKinematics
 		// arm base and arm centre are actually parallel joints, so we sum them
 		// to set the servo angle for the enter join
 
-		System.out.println("Center: "+Math.toDegrees(MeArmKinematics.CENTRE_JOINT_DEF.getJoint().getAngle()));
-		double d = (MeArmKinematics.CENTRE_JOINT_DEF.getJoint().getAngle()*-1.0) + Math.PI;
+		System.out.println("Center: "
+				+ Math.toDegrees(getComputedJointAngle(CENTER_JOINT)));
+		double d = (getComputedJointAngle(CENTER_JOINT) * -1.0) + Math.PI;
 		System.out.println(Math.toDegrees(d));
-		double angleX = (-1.0 * MeArmKinematics.BASE_JOINT_DEF.getJoint().getAngle()) + d;
+		double angleX = (-1.0 * getComputedJointAngle(BASE_JOINT)) + d;
 
 		if (angleX > Math.PI)
 		{
@@ -55,19 +63,19 @@ public class MeArmServoCalculator extends MeArmKinematics
 
 	public void setTurretAngle(double i)
 	{
-		MeArmKinematics.TURRET_JOINT_DEF.getJoint().setAngle(i);
+		setJointAngle(TURRET_JOINT,i);
 
 	}
 
 	public void setArmBaseAngle(double radians)
 	{
-		MeArmKinematics.BASE_JOINT_DEF.getJoint().setAngle(radians);
+		setJointAngle(BASE_JOINT,radians);
 
 	}
 
 	public void setArmCenterAngle(double radians)
 	{
-		MeArmKinematics.CENTRE_JOINT_DEF.getJoint().setAngle(radians);
+		setJointAngle(CENTER_JOINT,radians);
 
 	}
 }

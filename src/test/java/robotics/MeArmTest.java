@@ -1,5 +1,8 @@
 package robotics;
 
+import static org.junit.Assert.assertTrue;
+
+import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.junit.Test;
 
 import robotics.meArm.MeArmKinematics;
@@ -24,9 +27,23 @@ public class MeArmTest
 					Pose pose = new Pose(x, y, z, 0, 0, 0);
 
 					arm.setPosition(pose);
-					arm.checkError(arm, pose);
+					checkError(arm, pose);
 				}
 
+	}
+
+	private void checkError(MeArmKinematics arm, Pose pose)
+	{
+		Vector3D endPoint = arm.getEndEffectorPose().getTransform().getVector();
+
+		double xdiff = Math.abs(pose.getTransform().getVector().getX()
+				- endPoint.getX());
+		double ydiff = Math.abs(pose.getTransform().getVector().getY()
+				- endPoint.getY());
+		double zdiff = Math.abs(pose.getTransform().getVector().getZ()
+				- endPoint.getZ());
+		// System.out.println(pose.transform + " " + endPoint);
+		assertTrue(xdiff < 3 && ydiff < 3 && zdiff < 3);
 	}
 
 }

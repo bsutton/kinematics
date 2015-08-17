@@ -1,6 +1,5 @@
-package robotics.helpers;
+package robotics.servos;
 
-import robotics.iMotor;
 
 public class ServoAngleToPwmCalculator
 {
@@ -35,10 +34,10 @@ public class ServoAngleToPwmCalculator
 		c = minPwm - (minAngleR * m);
 	}
 	
-	public ServoAngleToPwmCalculator(iMotor motor)
+	public ServoAngleToPwmCalculator(ServoConfig servoConfig)
 	{
-		this(motor.getMinPwm(), motor.getMaxPwm(), motor.getMinAngle(),
-			motor.getMaxAngle());
+		this(servoConfig.getMinPwm(), servoConfig.getMaxPwm(), servoConfig.getMinAngle(),
+			servoConfig.getMaxAngle());
 	}
 
 

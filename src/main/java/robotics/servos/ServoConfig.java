@@ -1,4 +1,4 @@
-package robotics;
+package robotics.servos;
 
 /**
  * Attempt to abstract out the definition of a motor to make it easier to 
@@ -6,7 +6,7 @@ package robotics;
  * 
  * A motor powers a joint
  */
-public interface iMotor
+public interface ServoConfig
 {
 	String getName();
 	
