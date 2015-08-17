@@ -50,6 +50,7 @@ public abstract class ArmKinematics
 		definitions.put(link.getName(), link);
 	}
 
+	@SuppressWarnings("unchecked")
 	public <J extends iJoint>  J add(JointDefinition jointDef) throws DuplicateDefinition
 	{
 		if (definitionPoses != null)
