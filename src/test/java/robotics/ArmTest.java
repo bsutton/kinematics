@@ -8,13 +8,19 @@ import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3DFormat;
 import org.junit.Test;
 
+import robotics.arm.ArmKinematics;
+
 public class ArmTest
 {
 
-//	JointDefinition TURRET_JOINT_DEF = new JointDefinition("Turret", Axis.YAW);
-//	JointDefinition BASE_JOINT_DEF = new JointDefinition("Arm Base", Axis.PITCH);
-//	JointDefinition CENTRE_JOINT_DEF = new JointDefinition("Arm Center", Axis.PITCH);
-//	JointDefinition WRIST_JOINT_DEF = new JointDefinition("Wrist", Axis.PITCH);
+	// JointDefinition TURRET_JOINT_DEF = new JointDefinition("Turret",
+	// Axis.YAW);
+	// JointDefinition BASE_JOINT_DEF = new JointDefinition("Arm Base",
+	// Axis.PITCH);
+	// JointDefinition CENTRE_JOINT_DEF = new JointDefinition("Arm Center",
+	// Axis.PITCH);
+	// JointDefinition WRIST_JOINT_DEF = new JointDefinition("Wrist",
+	// Axis.PITCH);
 
 	// @Test
 	// public void testTurretAngle()
@@ -42,9 +48,9 @@ public class ArmTest
 	// double zdiff = Math.abs(pose.transform.transform.getZ()
 	// - endPoint.transform.transform.getZ());
 	//
-	// System.out.println(arm.getJoint("Turret").getJointAngle());
-	// System.out.println(arm.getJoint("Arm Base").getJointAngle());
-	// System.out.println(arm.getJoint("Arm Center").getJointAngle());
+	// System.out.println(arm.setJointAngle("Turret").setJointAngleAngle());
+	// System.out.println(arm.setJointAngle("Arm Base").setJointAngleAngle());
+	// System.out.println(arm.setJointAngle("Arm Center").setJointAngleAngle());
 	// System.out.println(x + " " + y + " " + z + " got " + endPoint);
 	// System.out.println(xdiff + " " + ydiff + " " + zdiff);
 	// assertTrue(xdiff < 2 && ydiff < 2 && zdiff < 2);
@@ -85,17 +91,21 @@ public class ArmTest
 	@Test
 	public void testJoint1()
 	{
-		ArmKinematics arm = defineArm();
-		arm.getComputationalPoses(null).get(TestArmKinematics.TURRET_JOINT_DEF).setAngle(0);
-		Pose pose = new Pose(0, 20, 202, 0, 0, 0);
+		TestArmKinematics arm = defineArm();
+		arm.setJointAngle(arm.TURRET_JOINT, 0);
+		Pose pose = new Pose(0, 20,
+				202 + TestArmKinematics.END_EFFECTOR_LENGTH, 0, 0, 0);
+
 		checkError(arm, pose);
 
-		arm.getComputationalPoses(null).get(TestArmKinematics.TURRET_JOINT_DEF).setAngle(Math.PI / -2);
-		pose = new Pose(-20, 0, 202, 0, 0, 0);
+		arm.setJointAngle(arm.TURRET_JOINT, Math.PI / -2);
+		pose = new Pose(-20, 0, 202 + TestArmKinematics.END_EFFECTOR_LENGTH, 0,
+				0, 0);
 		checkError(arm, pose);
 
-		arm.getComputationalPoses(null).get(TestArmKinematics.TURRET_JOINT_DEF).setAngle(Math.PI / 2);
-		pose = new Pose(20, 0, 202, 0, 0, 0);
+		arm.setJointAngle(arm.TURRET_JOINT, Math.PI / 2);
+		pose = new Pose(20, 0, 202 + TestArmKinematics.END_EFFECTOR_LENGTH, 0,
+				0, 0);
 		checkError(arm, pose);
 
 	}
@@ -103,17 +113,20 @@ public class ArmTest
 	@Test
 	public void testJoint2()
 	{
-		ArmKinematics arm = defineArm();
-		arm.getComputationalPoses(null).get(TestArmKinematics.BASE_JOINT_DEF).setAngle(0);
-		Pose pose = new Pose(0, 20, 202, 0, 0, 0);
+		TestArmKinematics arm = defineArm();
+		arm.setJointAngle(arm.BASE_JOINT, 0);
+		Pose pose = new Pose(0, 20,
+				202 + TestArmKinematics.END_EFFECTOR_LENGTH, 0, 0, 0);
 		checkError(arm, pose);
 
-		arm.getComputationalPoses(null).get(TestArmKinematics.BASE_JOINT_DEF).setAngle(Math.PI / 2);
-		pose = new Pose(0, 182, 40, 0, 0, 0);
+		arm.setJointAngle(arm.BASE_JOINT, Math.PI / 2);
+		pose = new Pose(0, 182 + TestArmKinematics.END_EFFECTOR_LENGTH, 40, 0,
+				0, 0);
 		checkError(arm, pose);
 
-		arm.getComputationalPoses(null).get(TestArmKinematics.BASE_JOINT_DEF).setAngle(Math.PI / -2);
-		pose = new Pose(0, -142, 40, 0, 0, 0);
+		arm.setJointAngle(arm.BASE_JOINT, Math.PI / -2);
+		pose = new Pose(0, -142 - TestArmKinematics.END_EFFECTOR_LENGTH, 40, 0,
+				0, 0);
 		checkError(arm, pose);
 
 	}
@@ -121,11 +134,11 @@ public class ArmTest
 	@Test
 	public void testTurretAngleDoesntAffectZ()
 	{
-		ArmKinematics arm = defineArm();
+		TestArmKinematics arm = defineArm();
 		Double z = arm.getEndEffectorPose().getZ();
 		for (double a = -Math.PI; a < Math.PI; a += Math.PI / 10.0)
 		{
-			arm.getComputationalPoses(null).get(TestArmKinematics.TURRET_JOINT_DEF).setAngle(a);
+			arm.setJointAngle(arm.TURRET_JOINT, a);
 			System.out.println(z + " " + arm.getEndEffectorPose().getZ());
 			assertTrue(Math.abs(arm.getEndEffectorPose().getZ() - z) < .1);
 
@@ -135,11 +148,11 @@ public class ArmTest
 	@Test
 	public void testArmBaseAngleDoesntAffectX()
 	{
-		ArmKinematics arm = defineArm();
+		TestArmKinematics arm = defineArm();
 		Double x = arm.getEndEffectorPose().getX();
 		for (double a = -Math.PI; a < Math.PI; a += Math.PI / 10.0)
 		{
-			arm.getComputationalPoses(null).get(TestArmKinematics.BASE_JOINT_DEF).setAngle(a);
+			arm.setJointAngle(arm.BASE_JOINT, a);
 			System.out.println(x + " " + arm.getEndEffectorPose().getX());
 			assertTrue(Math.abs(arm.getEndEffectorPose().getX() - x) < .1);
 
@@ -149,11 +162,11 @@ public class ArmTest
 	@Test
 	public void testArmMidAngleDoesntAffectX()
 	{
-		ArmKinematics arm = defineArm();
+		TestArmKinematics arm = defineArm();
 		Double x = arm.getEndEffectorPose().getX();
 		for (double a = -Math.PI; a < Math.PI; a += Math.PI / 10.0)
 		{
-			arm.getComputationalPoses(null).get(TestArmKinematics.CENTRE_JOINT_DEF).setAngle(a);
+			arm.setJointAngle(arm.CENTER_JOINT, a);
 			System.out.println(x + " " + arm.getEndEffectorPose().getX());
 			assertTrue(Math.abs(arm.getEndEffectorPose().getX() - x) < .1);
 
@@ -203,6 +216,32 @@ public class ArmTest
 				}
 
 	}
+	
+	
+
+	@Test
+	public void testArmExtensionInXYZplusPose()
+	{
+		// y= forward
+
+		ArmKinematics arm = defineArm();
+
+		// all angles zero
+		// Pose pose = new Pose(0, 20, 202, 0, 0, 0);
+
+		for (int y = 40; y < 100; y++)
+			for (int x = -80; x < 80; x++)
+				for (int z = 40; z < 100; z++)
+					for (int p = 90; p < 180; p++)
+					{
+						//System.out.println(x + " " + y + " " + z + " " + p);
+						Pose pose = new Pose(x, y, z, Math.toRadians(p), 0, 0);
+
+						arm.setPosition(pose);
+						checkError(arm, pose);
+					}
+
+	}
 
 	@Test
 	public void testArmExtensionInY()
@@ -218,6 +257,7 @@ public class ArmTest
 		int z = 40;
 		for (int y = 40; y < 150; y++)
 		{
+			System.out.println(y);
 			Pose pose = new Pose(x, y, z, 0, 0, 0);
 
 			arm.setPosition(pose);
@@ -247,9 +287,9 @@ public class ArmTest
 
 	}
 
-	private ArmKinematics defineArm()
+	private TestArmKinematics defineArm()
 	{
-		
+
 		return new TestArmKinematics();
 	}
 
@@ -261,7 +301,8 @@ public class ArmTest
 		ArmKinematics arm = defineArm();
 
 		// arm base 90 degrees
-		Pose pose = new Pose(0, 181.95, 40, 0, 0, 0);
+		Pose pose = new Pose(0, 181.95 - TestArmKinematics.END_EFFECTOR_LENGTH,
+				40, 0, 0, 0);
 
 		arm.setPosition(pose);
 
@@ -277,9 +318,7 @@ public class ArmTest
 		ArmKinematics arm = defineArm();
 
 		// all angles zero
-		arm.getComputationalPoses(null).get(TestArmKinematics.TURRET_JOINT_DEF).setAngle(0);
-		arm.getComputationalPoses(null).get(TestArmKinematics.BASE_JOINT_DEF).setAngle(0);
-		arm.getComputationalPoses(null).get(TestArmKinematics.CENTRE_JOINT_DEF).setAngle(0);
+		arm.resetJointsToZero();
 
 		Pose pose = new Pose(0, 20, 202, 0, 0, 0);
 
@@ -339,14 +378,20 @@ public class ArmTest
 
 	private void checkError(ArmKinematics arm, Pose pose)
 	{
-		Vector3D endPoint = arm.getEndEffectorPose();
+		Vector3D endPoint = arm.getEndEffectorPose().getTransform().getVector();
 
-		double xdiff = Math.abs(pose.getTransform().getVector().getX() - endPoint.getX());
-		double ydiff = Math.abs(pose.getTransform().getVector().getY() - endPoint.getY());
-		double zdiff = Math.abs(pose.getTransform().getVector().getZ() - endPoint.getZ());
+		double xdiff = Math.abs(pose.getTransform().getVector().getX()
+				- endPoint.getX());
+		double ydiff = Math.abs(pose.getTransform().getVector().getY()
+				- endPoint.getY());
+		double zdiff = Math.abs(pose.getTransform().getVector().getZ()
+				- endPoint.getZ());
 		// System.out.println(pose.transform + " " + endPoint);
+		if (!((xdiff < 3 && ydiff < 3 && zdiff < 3)))
+		{
+			System.out.println(pose.getTransform() + " != " + endPoint);
+		}
 		assertTrue(xdiff < 3 && ydiff < 3 && zdiff < 3);
 	}
-
 
 }

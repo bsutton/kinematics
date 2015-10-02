@@ -1,14 +1,18 @@
-package robotics;
+package robotics.arm4dof;
 
 import org.apache.commons.math3.geometry.euclidean.threed.Rotation;
 import org.apache.commons.math3.geometry.euclidean.threed.RotationOrder;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
+import robotics.Axis;
+import robotics.Frame;
+import robotics.Point3D;
+import robotics.Pose;
+import robotics.Transform;
 import robotics.arm.ArmKinematics;
 import robotics.arm.InvKinematics;
-import robotics.arm.Link;
 
-public class TestArmKinematics extends ArmKinematics
+public class Arm4Dof extends ArmKinematics
 {
 
 	public static final int END_EFFECTOR_LENGTH = 10;
@@ -22,7 +26,7 @@ public class TestArmKinematics extends ArmKinematics
 	public final Segment WRIST_JOINT;
 	private Segment END_EFFECTOR;
 
-	public TestArmKinematics()
+	public Arm4Dof()
 	{
 		super(Frame.getWorldFrame(), new Pose(0, 0, 0, 0, 0, 0));
 
@@ -91,6 +95,8 @@ public class TestArmKinematics extends ArmKinematics
 				setJointAngle(BASE_JOINT, baseAngle);
 				setJointAngle(CENTER_JOINT, midArmAngle);
 
+				// compensate the desired tip pose angle for the pose of the
+				// wrist angle
 				double wristAngle = tipPose.getXAngle()
 						- getSegmentPose(WRIST_JOINT).getXAngle();
 				setJointAngle(WRIST_JOINT, wristAngle);
@@ -100,17 +106,29 @@ public class TestArmKinematics extends ArmKinematics
 			private Pose getEndEffectorPoseFromTipPose(Pose tipPose,
 					double turretAngle)
 			{
-				Vector3D tipVector = getLink(END_EFFECTOR).getTransform().getVector();
-				Rotation turretCorrectedRotation = new Rotation(RotationOrder.XYZ,
-						tipPose.getXAngle(), 0, turretAngle);
-				double[] angles = turretCorrectedRotation.getAngles(RotationOrder.XYZ);
-				
-				Vector3D turretCorrectedTipVector = turretCorrectedRotation.applyInverseTo(tipVector);
-				
-				Point3D rootOfEndEffector = tipPose.getTransform().subtract(turretCorrectedTipVector);
-				
-				Pose tipPose1 = new Pose(rootOfEndEffector.getPoint(), turretCorrectedRotation);
-				
+				// get the vector representing the end effector
+				Vector3D tipVector = getLink(END_EFFECTOR).getTransform()
+						.getVector();
+
+				// create a rotation for the desired x rotation for the end
+				// effector plus the required z rotation to match the turret
+				// angle of the arm base
+				Rotation turretCorrectedRotation = new Rotation(
+						RotationOrder.XYZ, tipPose.getXAngle(), 0, turretAngle);
+
+				// rotate the tip vector
+				Vector3D turretCorrectedTipVector = turretCorrectedRotation
+						.applyInverseTo(tipVector);
+
+				// subtract the tip vector from the tipPose to get the root of
+				// the end effector
+				Point3D rootOfEndEffector = tipPose.getTransform().subtract(
+						turretCorrectedTipVector);
+
+				// construct a new pose for the root of the end effector
+				Pose tipPose1 = new Pose(rootOfEndEffector.getPoint(),
+						turretCorrectedRotation);
+
 				return tipPose1;
 			}
 

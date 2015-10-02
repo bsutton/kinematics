@@ -33,7 +33,7 @@ public class Point3D
 
 	public Point3D subtract(Transform transform)
 	{
-		return transform.subtract(getPoint());
+		return new Point3D(getPoint().subtract(transform.getVector()));
 	}
 
 	public Point3D rotate(Rotation rotation)
